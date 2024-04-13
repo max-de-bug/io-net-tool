@@ -5,10 +5,14 @@ import { Button, buttonVariants } from "./ui/button";
 import { cn } from "../../lib/utils/cn";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
+import { loginIsRequiredClient } from "../../lib/auth";
+import { useSession } from "next-auth/react";
 
 const NavBar = () => {
   const appContext = useContext(AppContext);
   const { openPopup } = appContext;
+  const { data: session } = useSession();
+
   return (
     <nav className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 backdrop-blur-lg transition-all">
       <MaxWidthWrapper>

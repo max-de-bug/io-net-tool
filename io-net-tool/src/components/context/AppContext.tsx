@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "next-auth/react";
 import React, { ChangeEvent, ReactNode, createContext, useState } from "react";
 import { number } from "zod";
 
@@ -48,6 +49,8 @@ const AppContextProvider = ({ children }: ProviderProps) => {
   const [ServerName, setServerName] = useState("");
   const [selectedCard, setSelectedCard] = useState(false);
   const [counter, setCounter] = useState(0);
+
+  //authSession
 
   const openPopup = () => {
     setIsOpen(true);

@@ -6,13 +6,11 @@ import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 import StatusMenu from "@/components/StatusMenu";
 import { AppContextProvider } from "@/components/context/AppContext";
-import { SessionProvider } from "next-auth/react";
 // import Auth from "./auth/auth";
 
-export default function Home({ session }) {
+export default function Home() {
   return (
-    <SessionProvider session={session}>
-      {/* <Auth /> */}
+    <>
       <AppContextProvider>
         <main className="p-2">
           <ConnectionPopUp />
@@ -25,6 +23,6 @@ export default function Home({ session }) {
           <Footer />
         </main>
       </AppContextProvider>
-    </SessionProvider>
+    </>
   );
 }
