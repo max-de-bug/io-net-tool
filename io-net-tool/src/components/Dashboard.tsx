@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import Container from "./Container";
 import { getServerSession } from "next-auth/next";
-import { authConfig, loginIsRequiredServer } from "../../lib/auth";
+import {
+  authConfig,
+  loginIsRequiredClient,
+  loginIsRequiredServer,
+} from "../../lib/auth";
 
-const Dashboard = async () => {
+const Dashboard = () => {
   // await loginIsRequiredServer();
-  const session = await getServerSession(authConfig);
-  console.log(session);
   return (
     <div className="w-full min-h-full p-4 border-b-2 border-t-2 border-t-white border-b-cyan-100 shadow-lg  mb-8 h-80 min-h-72">
       <div className="w-full h-full flex flex-row gap-5">

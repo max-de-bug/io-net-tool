@@ -7,6 +7,7 @@ import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
 import { loginIsRequiredClient } from "../../lib/auth";
 import { useSession } from "next-auth/react";
+import UserAccount from "./UserAccount";
 
 const NavBar = () => {
   const appContext = useContext(AppContext);
@@ -22,17 +23,29 @@ const NavBar = () => {
           </Link>
 
           <div className="hidden items-center space-x-4 sm:flex">
-            <Button
-              className={cn(
-                buttonVariants({
-                  variant: "outline",
-                  size: "sm",
-                })
-              )}
-              onClick={openPopup}
-            >
-              <span className="font-medium text-black">Connect to server</span>
-            </Button>
+            {!session ? (
+              <Button>
+                <Link href="/authChoise">Sign In</Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  className={cn(
+                    buttonVariants({
+                      variant: "outline",
+                      size: "lg",
+                    })
+                  )}
+                  onClick={openPopup}
+                >
+                  <span className="font-medium text-black">
+                    Connect to server
+                  </span>
+                </Button>
+
+                <UserAccount />
+              </>
+            )}
           </div>
         </div>
       </MaxWidthWrapper>
