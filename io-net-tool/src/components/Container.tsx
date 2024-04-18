@@ -1,10 +1,11 @@
 "use client";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
+import { ServerContext } from "./context/ServerContext";
 
 const Container = () => {
-  const appContext = useContext(AppContext);
-  const { selectedCard, handleCardClick, handleDoubleClick } = appContext;
+  const serverContext = useContext(ServerContext);
+  const { selectedCard, handleCardClick, handleDoubleClick } = serverContext;
 
   return (
     <div

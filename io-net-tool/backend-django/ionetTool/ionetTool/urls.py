@@ -16,7 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import (
+    add_server,
+    start_new_worker,
+    reset_containers_images,
+    check_status_worker,
+    restart_server
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('add-server/', add_server, name='add_server'),
+    path('start-new-worker/', start_new_worker, name='start_new_worker'),
+    path('reset-containers-images/', reset_containers_images, name='reset_containers_images'),
+    path('check-status-worker/', check_status_worker, name='check_status_worker'),
+    path('restart-server/', restart_server, name='restart_server'),
 ]

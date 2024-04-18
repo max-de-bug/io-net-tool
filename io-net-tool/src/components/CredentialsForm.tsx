@@ -1,7 +1,7 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface CredentialsFormProps {
@@ -12,7 +12,10 @@ export function CredentialsForm(props: CredentialsFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: {
+    preventDefault: () => void;
+    currentTarget: HTMLFormElement | undefined;
+  }) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
 
@@ -24,7 +27,7 @@ export function CredentialsForm(props: CredentialsFormProps) {
 
     if (signInResponse && !signInResponse.error) {
       //Redirect to homepage (/timeline)
-      router.push("/timeline");
+      router.push("/");
     } else {
       console.log("Error: ", signInResponse);
       setError("Your Email or Password is wrong!");

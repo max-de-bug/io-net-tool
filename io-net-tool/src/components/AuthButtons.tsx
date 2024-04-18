@@ -39,7 +39,7 @@ export function GithubSignInButton() {
 
 export function CredentialsSignInButton() {
   const router = useRouter();
-
+  /// session check
   const handleClick = () => {
     router.push("/emailAuth"); // Change this to your email sign in route
   };

@@ -2,10 +2,12 @@
 
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
+import { ServerActions } from "./ServerAction";
+import { ServerContext } from "./context/ServerContext";
 
 const StatusMenu = () => {
-  const appContext = useContext(AppContext);
-  const { counter } = appContext;
+  const serverContext = useContext(ServerContext);
+  const { counter } = serverContext;
   return (
     <>
       <div className="flex flex-row items-center gap-5 overflow-x-auto p-4 pb-2 border-x-2 border-white">
@@ -69,6 +71,7 @@ const StatusMenu = () => {
         <div className="flex justify-center content-center border-l-2 border-white p-2">
           <p className="text-base text-gray-300">Servers selected: {counter}</p>
         </div>
+        <ServerActions />
       </div>
     </>
   );

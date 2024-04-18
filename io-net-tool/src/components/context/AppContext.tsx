@@ -1,14 +1,16 @@
 "use client";
-import { useSession } from "next-auth/react";
 import React, { ChangeEvent, ReactNode, createContext, useState } from "react";
-import { number } from "zod";
 
 interface AppContextProps {
   isOpen: boolean;
   selectedCard: boolean;
   login: string;
   password: string;
+  IP: number;
+  serverName: string;
   counter: number;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
   openPopup: () => void;
   closePopup: () => void;
   handleIPChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -25,7 +27,11 @@ const AppContext = createContext<AppContextProps>({
   selectedCard: false,
   login: "",
   password: "",
+  IP: 0,
+  serverName: "",
   counter: 0,
+  loading: false,
+  setLoading: () => {},
   openPopup: () => {},
   closePopup: () => {},
   handleUserChange: () => {},
@@ -42,11 +48,13 @@ interface ProviderProps {
 }
 
 const AppContextProvider = ({ children }: ProviderProps) => {
+  const [loading, setLoading] = useState(false);
+
   const [isOpen, setIsOpen] = useState(false);
   const [login, setUser] = useState("");
-  const [IP, setIP] = useState("");
+  const [IP, setIP] = useState(0);
   const [password, setPassword] = useState("");
-  const [ServerName, setServerName] = useState("");
+  const [serverName, setServerName] = useState("");
   const [selectedCard, setSelectedCard] = useState(false);
   const [counter, setCounter] = useState(0);
 
@@ -85,16 +93,19 @@ const AppContextProvider = ({ children }: ProviderProps) => {
     setCounter((prevCounter) => prevCounter - 1);
   };
 
-  const handleOnSubmit = () => {
-    // Handle form submission logic here
-    console.log("Submitting form...");
+  const handleOnSubmit = ({ data }) => {
+    console.log("Submitting form...", data);
   };
 
   const AppContextValues: AppContextProps = {
     isOpen,
     login,
     password,
+    IP,
+    serverName,
     counter,
+    loading,
+    setLoading,
     openPopup,
     closePopup,
     handleUserChange,

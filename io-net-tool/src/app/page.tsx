@@ -6,22 +6,25 @@ import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 import StatusMenu from "@/components/StatusMenu";
 import { AppContextProvider } from "@/components/context/AppContext";
+import { ServerContextProvider } from "@/components/context/ServerContext";
 // import Auth from "./auth/auth";
 
 export default function Home() {
   return (
     <>
       <AppContextProvider>
-        <main className="p-2">
-          <ConnectionPopUp />
-          <NavBar />
-          <StatusMenu />
-          <div className="flex mb-5 h-screen">
-            <DashboardMenu />
-            <Dashboard />
-          </div>
-          <Footer />
-        </main>
+        <ServerContextProvider>
+          <main className="p-2">
+            <ConnectionPopUp />
+            <NavBar />
+            <StatusMenu />
+            <div className="flex mb-5 h-screen">
+              <DashboardMenu />
+              <Dashboard />
+            </div>
+            <Footer />
+          </main>
+        </ServerContextProvider>
       </AppContextProvider>
     </>
   );

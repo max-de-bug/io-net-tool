@@ -10,6 +10,8 @@ import bcrypt from "bcryptjs";
 export const authConfig: NextAuthOptions = {
   providers: [
     CredentialsProvider({
+      type: "credentials",
+      id: "credentials",
       name: "Sign in",
       credentials: {
         email: {
@@ -19,20 +21,27 @@ export const authConfig: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials || !credentials.email || !credentials.password)
           return null;
 
-        //need renaming
         const dbUser = await prisma.user.findFirst({
           where: { email: credentials.email },
         });
 
-        //Verify Password here
-        //We are going to use a simple === operator
-        //In production DB, passwords should be encrypted using something like bcrypt...
+        if (!dbUser) {
+          const hashedPassword = await bcrypt.hash(credentials.password, 10); // Hash the password
+          const newUser = await prisma.user.create({
+            data: {
+              email: credentials.email,
+              password: hashedPassword,
+              // You may add other fields if necessary
+            },
+          });
+          return newUser;
+        }
         if (dbUser) {
-          // Compare hashed password with the provided password
+          // Compare hashed password with the provided password using bcrypt
           const passwordMatch = await bcrypt.compare(
             credentials.password,
             dbUser.password
@@ -46,7 +55,7 @@ export const authConfig: NextAuthOptions = {
           }
         }
 
-        return null;
+        // return null;
       },
     }),
     GoogleProvider({
@@ -90,11 +99,9 @@ export const authConfig: NextAuthOptions = {
   },
   //@ts-ignore
   async jwt({ token, account }) {
-    // Persist the OAuth access_token to the token right after signin
-    if (account) {
-      token.accessToken = account.access_token;
-    }
-    return token;
+    console.log("token");
+    console.log(token);
+    console.log(account);
   },
   //@ts-ignore
   async session({ session }) {
