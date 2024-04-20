@@ -14,17 +14,22 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { formSchema } from "../../lib/types";
-import { z } from "zod";
+import { date, z } from "zod";
 import { useRouter } from "next/navigation";
+import * as Api from "./../app/api";
+import { ServerValues } from "@/app/api/dto";
+import { useSession } from "next-auth/react";
+import { loginIsRequiredClient, loginIsRequiredServer } from "../../lib/auth";
 
 interface FormData {
-  IP: string;
-  login: string;
+  IP: number;
+  username: string;
   password: string;
   serverName: string;
 }
 
 const ConnectionPopUp = () => {
+  const { data: session, status } = useSession();
   const router = useRouter();
   const appContext = useContext(AppContext);
   const {
@@ -44,33 +49,16 @@ const ConnectionPopUp = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-
+  // const userId = session?.user.id;
   const onSubmit: SubmitHandler<FormData> = async (
     values: z.infer<typeof formSchema>
   ) => {
-    try {
-      setLoading(true); // Set loading to true when form is submitted
-      console.log("Form submitted with values:", values);
-      let response = await fetch("http://127.0.0.1:8000/add-server/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-        },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) {
-        throw new Error("Something went wrong");
-      } else {
-        let result = await response.json();
-        closePopup();
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // setLoading(true); // Set loading to true when form is submitted
+    console.log("Form submitted with values:", values);
+    const serverInfo = await Api.server.serverSaving<ServerValues>(values);
 
+    console.log(serverInfo);
+  };
   return (
     <div className="relative">
       {isOpen && (
@@ -112,22 +100,23 @@ const ConnectionPopUp = () => {
                       <FormLabel className="text-black">IP</FormLabel>
                       <FormControl>
                         <Input
-                          {...register("IP")}
+                          {...register("IP", { required: true })}
                           placeholder="xxx.xx.xx.xx"
                           className="w-full px-3 py-2 border border-gray-300 rounded outline-0"
-                          type="text"
+                          type="number"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                     <FormItem>
-                      <FormLabel className="text-black">User</FormLabel>
+                      <FormLabel className="text-black">Username</FormLabel>
                       <FormControl>
                         <Input
-                          {...register("login")}
-                          placeholder="User"
+                          {...register("username", { required: true })}
+                          placeholder="Username"
                           className="focus:outline-none w-full px-3 py-2 border border-gray-300 rounded"
                           type="text"
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -136,10 +125,11 @@ const ConnectionPopUp = () => {
                       <FormLabel className="text-black">Password</FormLabel>
                       <FormControl>
                         <Input
-                          {...register("password")}
+                          {...register("password", { required: true })}
                           placeholder="Password"
                           className="focus:outline-none w-full px-3 py-2 border border-gray-300 rounded"
                           type="text"
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -148,10 +138,11 @@ const ConnectionPopUp = () => {
                       <FormLabel className="text-black">Server Name</FormLabel>
                       <FormControl>
                         <Input
-                          {...register("serverName")}
+                          {...register("serverName", { required: true })}
                           placeholder="Server Name"
                           className="focus:outline-none w-full px-3 py-2 border border-gray-300 rounded"
                           type="text"
+                          required
                         />
                       </FormControl>
                       <FormMessage />

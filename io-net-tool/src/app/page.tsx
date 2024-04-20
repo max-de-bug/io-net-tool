@@ -1,30 +1,31 @@
 "use client";
 import ConnectionPopUp from "@/components/ConnectionPopUp";
 import Dashboard from "@/components/Dashboard";
-import DashboardMenu from "@/components/DashboardMenu";
+import DashboardMenuVm from "@/components/DashboardMenuVm";
+import DashboardMenuWorker from "@/components/DashboardMenuWorker";
 import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 import StatusMenu from "@/components/StatusMenu";
 import { AppContextProvider } from "@/components/context/AppContext";
-import { ServerContextProvider } from "@/components/context/ServerContext";
+import { CardContextProvider } from "@/components/context/CardContext";
 // import Auth from "./auth/auth";
 
 export default function Home() {
   return (
     <>
       <AppContextProvider>
-        <ServerContextProvider>
+        <CardContextProvider>
           <main className="p-2">
             <ConnectionPopUp />
             <NavBar />
             <StatusMenu />
             <div className="flex mb-5 h-screen">
-              <DashboardMenu />
+              <DashboardMenuWorker />
               <Dashboard />
             </div>
             <Footer />
           </main>
-        </ServerContextProvider>
+        </CardContextProvider>
       </AppContextProvider>
     </>
   );

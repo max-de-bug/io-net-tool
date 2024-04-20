@@ -10,9 +10,11 @@ import { useSession } from "next-auth/react";
 import UserAccount from "./UserAccount";
 
 const NavBar = () => {
+  const { data: session } = useSession();
+
+  console.log(session);
   const appContext = useContext(AppContext);
   const { openPopup } = appContext;
-  const { data: session } = useSession();
 
   return (
     <nav className="sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 backdrop-blur-lg transition-all">

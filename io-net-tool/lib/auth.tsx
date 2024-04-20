@@ -69,9 +69,14 @@ export const authConfig: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async session({ session }) {
+      const sessionUser = await prisma.oauthUser.findFirst({
+        where: { email: session.user.email },
+      });
+      session.user.id = sessionUser?.id;
+      return session;
+    },
     async signIn({ profile }) {
-      console.log(profile?.email);
-
       if (!profile?.email) {
         // Handle missing email case (return null or throw an error)
         console.error("Email not found in the profile object");
@@ -97,29 +102,10 @@ export const authConfig: NextAuthOptions = {
       return newUser; // Return the newly created user
     },
   },
-  //@ts-ignore
-  async jwt({ token, account }) {
-    console.log("token");
-    console.log(token);
-    console.log(account);
-  },
-  //@ts-ignore
-  async session({ session }) {
-    const sessionUser = prisma.oauthUser.findFirst({
-      where: { email: session.user.email },
-    });
-
-    if (sessionUser) {
-      session.user.id = sessionUser.id;
-    }
-
-    return session;
-  },
 };
 
 export async function loginIsRequiredServer() {
   const session = await getServerSession(authConfig);
-  console.log(session);
   if (!session) return redirect("/authChoise");
 }
 

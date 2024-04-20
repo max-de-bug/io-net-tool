@@ -2,12 +2,12 @@
 
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
-import { ServerActions } from "./ServerAction";
-import { ServerContext } from "./context/ServerContext";
+import { ServerActions } from "./CardAction";
+import { CardContext } from "./context/CardContext";
 
 const StatusMenu = () => {
-  const serverContext = useContext(ServerContext);
-  const { counter } = serverContext;
+  const cardContext = useContext(CardContext);
+  const { counter } = cardContext;
   return (
     <>
       <div className="flex flex-row items-center gap-5 overflow-x-auto p-4 pb-2 border-x-2 border-white">

@@ -8,15 +8,29 @@ datasource db {
 }
 
 model OauthUser {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   email     String   @unique
   name      String
   createdAt DateTime @default(now())
+  servers   Server[]
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+  servers   Server[]
+}
+
+model Server {
+  id          Int        @id @default(autoincrement())
+  IP          Int
+  serverName  String
+  username    String
+  password    String
+  user        User?      @relation(fields: [userId], references: [id])
+  userId      String?
+  OauthUser   OauthUser? @relation(fields: [OauthUserId], references: [id])
+  OauthUserId String?
 }
