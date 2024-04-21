@@ -2,12 +2,15 @@
 import { useContext, useState } from "react";
 import { AppContext } from "./context/AppContext";
 import { CardContext } from "./context/CardContext";
+import { useSession } from "next-auth/react";
 
-const Container = () => {
+const Container = ({ serverData }) => {
   const cardContext = useContext(CardContext);
   const { selectedCard, handleSingleClick, handleSingleAndDoubleClick } =
     cardContext;
-
+  const { data: session, status } = useSession();
+  const userId = session?.user.id;
+  const { serverName, username, ip } = serverData || {};
   // State to track the number of single clicks
   return (
     <div
@@ -20,9 +23,9 @@ const Container = () => {
       <div className="flex justify-between">
         <h3 className="text-lg font-bold mb-4">Status</h3>
 
-        <p>Server Name: MyServer</p>
-        <p>Username: Konor</p>
-        <p>IP: 192.123.203</p>
+        <p>Server Name: {serverName}</p>
+        <p>Username: {username}</p>
+        <p>IP: {ip}</p>
       </div>
     </div>
   );

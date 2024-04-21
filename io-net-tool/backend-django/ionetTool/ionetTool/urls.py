@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from .views import (
     add_server,
+    setup_virtual_machine,
     start_new_worker,
     reset_containers_images,
     check_status_worker,
@@ -30,4 +31,5 @@ urlpatterns = [
     path('reset-containers-images/', reset_containers_images, name='reset_containers_images'),
     path('check-status-worker/', check_status_worker, name='check_status_worker'),
     path('restart-server/', restart_server, name='restart_server'),
+    path("setup-virtual-machine/", setup_virtual_machine, name="setup_virtual_machine" )
 ]

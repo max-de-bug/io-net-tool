@@ -103,7 +103,7 @@ const ConnectionPopUp = () => {
                           {...register("IP", { required: true })}
                           placeholder="xxx.xx.xx.xx"
                           className="w-full px-3 py-2 border border-gray-300 rounded outline-0"
-                          type="number"
+                          type="text"
                         />
                       </FormControl>
                       <FormMessage />

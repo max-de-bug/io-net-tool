@@ -73,66 +73,27 @@ export const authConfig: NextAuthOptions = {
   ],
   secret: process.env.JWT_SECRET,
   callbacks: {
-    async session({ session }) {
-      const sessionUser = await prisma.oauthUser.findFirst({
+    async session({ session, token }) {
+      const sessionUser = await prisma.user.findFirst({
         where: { email: session.user.email },
       });
       session.user.id = sessionUser?.id;
       return session;
     },
     async signIn({ profile, credentials }) {
-      // Check if credentials are provided
-      if (credentials) {
-        // Check if a user with the provided email exists in the database
-        const dbUser = await prisma.user.findFirst({
-          where: { email: credentials.email },
-        });
-
-        if (!dbUser) {
-          // If the user doesn't exist, create a new user
-          const hashedPassword = await bcrypt.hash(credentials.password, 10); // Hash the password
-          const newUser = await prisma.user.create({
-            data: {
-              email: credentials.email,
-              password: hashedPassword,
-              // You may add other fields if necessary
-            },
-          });
-          return newUser;
-        } else {
-          // If the user already exists, compare the provided password with the stored password
-          const passwordMatch = await bcrypt.compare(
-            credentials.password,
-            dbUser.password
-          );
-
-          if (passwordMatch) {
-            // Passwords match, return user data without sensitive information
-            const { password, createdAt, ...dbUserWithoutPassword } = dbUser;
-            return dbUserWithoutPassword as User;
-          }
-        }
-      }
-
-      // Check if the user exists in the database based on the OAuth profile
-      const dbUser = await prisma.oauthUser.findFirst({
+      //     // Chec k if credentials are provided
+      const dbUser = await prisma.user.findFirst({
         where: { email: profile.email },
       });
 
-      if (dbUser) {
-        // Existing user found, return user data
-        return dbUser;
+      if (!dbUser) {
+        const newUser = await prisma.user.create({
+          data: {
+            email: profile.email,
+          },
+        });
+        return newUser;
       }
-
-      // Create a new user if not found (assuming this is the desired behavior)
-      const newUser = await prisma.oauthUser.create({
-        data: {
-          email: profile.email,
-          name: profile.name,
-        },
-      });
-
-      return newUser; // Return the newly created user
     },
   },
 };

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Server" ALTER COLUMN "IP" SET DATA TYPE TEXT;
