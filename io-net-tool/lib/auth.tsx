@@ -1,18 +1,18 @@
 import { NextAuthOptions, User, getServerSession } from "next-auth";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
+import TwitterProvider from "next-auth/providers/twitter";
+
 import { prisma } from "../prisma/prisma/prismaClient/client";
 import bcrypt from "bcryptjs";
 
 export const authConfig: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      type: "credentials",
-      id: "credentials",
-      name: "Sign in",
+      name: "credentials",
       credentials: {
         email: {
           label: "Email",
@@ -21,6 +21,7 @@ export const authConfig: NextAuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials, req) {
         if (!credentials || !credentials.email || !credentials.password)
           return null;
@@ -49,18 +50,20 @@ export const authConfig: NextAuthOptions = {
 
           if (passwordMatch) {
             // Passwords match, return user data without sensitive information
-            const { password, createdAt, id, ...dbUserWithoutPassword } =
-              dbUser;
+            const { password, createdAt, ...dbUserWithoutPassword } = dbUser;
             return dbUserWithoutPassword as User;
           }
         }
-
-        // return null;
+        return null;
       },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    TwitterProvider({
+      clientId: process.env.TWITTER_CLIENT_ID as string,
+      clientSecret: process.env.TWITTER_CLIENT_SECRET as string,
     }),
 
     GithubProvider({
@@ -68,6 +71,7 @@ export const authConfig: NextAuthOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     }),
   ],
+  secret: process.env.JWT_SECRET,
   callbacks: {
     async session({ session }) {
       const sessionUser = await prisma.oauthUser.findFirst({
@@ -76,19 +80,48 @@ export const authConfig: NextAuthOptions = {
       session.user.id = sessionUser?.id;
       return session;
     },
-    async signIn({ profile }) {
-      if (!profile?.email) {
-        // Handle missing email case (return null or throw an error)
-        console.error("Email not found in the profile object");
-        return null; // Or throw an appropriate error
+    async signIn({ profile, credentials }) {
+      // Check if credentials are provided
+      if (credentials) {
+        // Check if a user with the provided email exists in the database
+        const dbUser = await prisma.user.findFirst({
+          where: { email: credentials.email },
+        });
+
+        if (!dbUser) {
+          // If the user doesn't exist, create a new user
+          const hashedPassword = await bcrypt.hash(credentials.password, 10); // Hash the password
+          const newUser = await prisma.user.create({
+            data: {
+              email: credentials.email,
+              password: hashedPassword,
+              // You may add other fields if necessary
+            },
+          });
+          return newUser;
+        } else {
+          // If the user already exists, compare the provided password with the stored password
+          const passwordMatch = await bcrypt.compare(
+            credentials.password,
+            dbUser.password
+          );
+
+          if (passwordMatch) {
+            // Passwords match, return user data without sensitive information
+            const { password, createdAt, ...dbUserWithoutPassword } = dbUser;
+            return dbUserWithoutPassword as User;
+          }
+        }
       }
 
+      // Check if the user exists in the database based on the OAuth profile
       const dbUser = await prisma.oauthUser.findFirst({
         where: { email: profile.email },
       });
 
       if (dbUser) {
-        return dbUser; // Existing user found, return user data
+        // Existing user found, return user data
+        return dbUser;
       }
 
       // Create a new user if not found (assuming this is the desired behavior)

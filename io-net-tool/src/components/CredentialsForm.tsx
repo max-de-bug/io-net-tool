@@ -24,7 +24,6 @@ export function CredentialsForm(props: CredentialsFormProps) {
       password: data.get("password"),
       redirect: false,
     });
-
     if (signInResponse && !signInResponse.error) {
       //Redirect to homepage (/timeline)
       router.push("/");
@@ -32,6 +31,7 @@ export function CredentialsForm(props: CredentialsFormProps) {
       console.log("Error: ", signInResponse);
       setError("Your Email or Password is wrong!");
     }
+    console.log("sign-in-response", signInResponse);
   };
 
   return (

@@ -12,6 +12,7 @@ import {
   CredentialsSignInButton,
   GithubSignInButton,
   GoogleSignInButton,
+  TwitterSignInButton,
 } from "@/components/AuthButtons";
 
 import { loginIsRequiredClient } from "../../../lib/auth";
@@ -27,6 +28,7 @@ export default async function SignInPage() {
       <div className="flex flex-col items-center mt-10 p-10 shadow-md">
         <h1 className="mt-10 mb-4 text-4xl font-bold text-white">Sign In</h1>
         <GoogleSignInButton />
+        <TwitterSignInButton />
         <GithubSignInButton />
         <span className="text-2xl font-semibold text-white text-center mt-8">
           Or
