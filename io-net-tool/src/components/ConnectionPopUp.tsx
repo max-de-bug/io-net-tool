@@ -14,12 +14,9 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { formSchema } from "../../lib/types";
-import { date, z } from "zod";
-import { useRouter } from "next/navigation";
 import * as Api from "./../app/api";
 import { ServerValues } from "@/app/api/dto";
-import { useSession } from "next-auth/react";
-import { loginIsRequiredClient, loginIsRequiredServer } from "../../lib/auth";
+import { z } from "zod";
 
 interface FormData {
   IP: number;
@@ -29,20 +26,8 @@ interface FormData {
 }
 
 const ConnectionPopUp = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   const appContext = useContext(AppContext);
-  const {
-    isOpen,
-    handleUserChange,
-    handleIPChange,
-    handleServerNameChange,
-    handlePasswordChange,
-    handleOnSubmit,
-    loading,
-    setLoading,
-    closePopup,
-  } = appContext;
+  const { isOpen, loading, closePopup } = appContext;
 
   const { handleSubmit, register } = useForm<FormData>();
 

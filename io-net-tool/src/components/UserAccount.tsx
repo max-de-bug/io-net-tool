@@ -20,8 +20,11 @@ interface UserAccountNavProps {
 
 const UserAccount = () => {
   const { data: session } = useSession();
-  const { image, email, name } = session?.user;
-  console.log(session?.user);
+  const { image, email, name } = session?.user || {
+    image: "",
+    email: "",
+    name: "",
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="overflow-visible">

@@ -1,4 +1,3 @@
-"use client";
 import ConnectionPopUp from "@/components/ConnectionPopUp";
 import Dashboard from "@/components/Dashboard";
 import DashboardMenuVm from "@/components/DashboardMenuVm";

@@ -5,11 +5,11 @@ import { CardContext } from "./context/CardContext";
 
 const DashboardMenuWorker = () => {
   const cardContext = useContext(CardContext);
-  const { selectedCard } = cardContext;
+  const { selectedCards } = cardContext;
   return (
     <div className="w-1/5 p-4 border-2 border-white shadow-lg h-80 min-h-full">
       <div className="flex flex-col  text-white text-center rounded-md h-full w-full cursor-pointer">
-        {selectedCard ? (
+        {selectedCards ? (
           <>
             <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
               Worker

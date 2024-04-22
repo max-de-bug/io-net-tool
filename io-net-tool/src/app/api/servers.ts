@@ -35,7 +35,9 @@ export const serverSaving = async (values: ServerValues) => {
   }
 };
 
-export const getServer = async (userId: string) => {
+export const getServer = async () => {
+  const session = await getServerSession(authConfig);
+  const userId = session?.user.id;
   try {
     // Find servers belonging to the user
     const servers = await prisma.server.findMany({
@@ -43,7 +45,6 @@ export const getServer = async (userId: string) => {
         userId: userId,
       },
     });
-
     return servers;
   } catch (error) {
     // Handle any errors

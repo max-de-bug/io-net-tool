@@ -1,6 +1,6 @@
 export interface ServerValues {
   serverName: string;
-  IP: number;
+  IP: string;
   username: string;
   password: string;
 }

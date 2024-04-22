@@ -1,32 +1,46 @@
 "use client";
 import { useContext, useState } from "react";
-import { AppContext } from "./context/AppContext";
 import { CardContext } from "./context/CardContext";
-import { useSession } from "next-auth/react";
 
-const Container = ({ serverData }) => {
+interface ServerData {
+  id: string;
+  serverName: string;
+  username: string;
+  IP: string;
+}
+
+const Container = ({ serverData }: { serverData: ServerData[] }) => {
   const cardContext = useContext(CardContext);
-  const { selectedCard, handleSingleClick, handleSingleAndDoubleClick } =
-    cardContext;
-  const { data: session, status } = useSession();
-  const userId = session?.user.id;
-  const { serverName, username, ip } = serverData || {};
-  // State to track the number of single clicks
-  return (
-    <div
-      className={`bg-black border-2 border-cyan-100 rounded-lg p-4 h-16 w-full text-white cursor-pointer hover:bg-cyan-600 ${
-        selectedCard ? "bg-cyan-600" : ""
-      }`}
-      onClick={handleSingleClick} // Handle single-click
-      onDoubleClick={handleSingleAndDoubleClick} // Handle double-click
-    >
-      <div className="flex justify-between">
-        <h3 className="text-lg font-bold mb-4">Status</h3>
+  const {
+    selectedCards,
+    handleSingleClick,
+    handleSingleAndDoubleClick,
+    clickedServerId,
+    isActive,
+    changeColorServer,
+  } = cardContext;
 
-        <p>Server Name: {serverName}</p>
-        <p>Username: {username}</p>
-        <p>IP: {ip}</p>
-      </div>
+  return (
+    <div className="flex flex-col gap-5 w-full">
+      {serverData.map((server) => (
+        <div
+          key={server.id}
+          className={`bg-black border-2 border-cyan-100 rounded-lg p-4 h-16 w-full text-white cursor-pointer hover:bg-cyan-600 ${
+            selectedCards?.includes(server.id) || changeColorServer
+              ? "bg-cyan-600"
+              : ""
+          }`}
+          onClick={() => handleSingleClick(server.id)}
+          onDoubleClick={() => handleSingleAndDoubleClick(server.id)}
+        >
+          <div className="flex justify-between">
+            <p className="text-lg font-bold mb-4">Status</p>
+            <p>Server Name: {server.serverName}</p>
+            <p>Username: {server.username}</p>
+            <p>IP: {server.IP}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
