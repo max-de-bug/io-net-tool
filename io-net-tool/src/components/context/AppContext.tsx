@@ -19,7 +19,6 @@ interface AppContextProps {
   handleServerNameChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleCardClick: () => void;
   handleDoubleClick: () => void;
-  handleOnSubmit: () => void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -40,7 +39,6 @@ const AppContext = createContext<AppContextProps>({
   handleServerNameChange: () => {},
   handleCardClick: () => {},
   handleDoubleClick: () => {},
-  handleOnSubmit: () => {},
 });
 
 interface ProviderProps {
@@ -93,10 +91,6 @@ const AppContextProvider = ({ children }: ProviderProps) => {
     setCounter((prevCounter) => prevCounter - 1);
   };
 
-  const handleOnSubmit = ({ data }) => {
-    console.log("Submitting form...", data);
-  };
-
   const AppContextValues: AppContextProps = {
     isOpen,
     login,
@@ -112,7 +106,6 @@ const AppContextProvider = ({ children }: ProviderProps) => {
     handlePasswordChange,
     handleIPChange,
     handleServerNameChange,
-    handleOnSubmit,
     handleCardClick,
     handleDoubleClick,
     selectedCard,

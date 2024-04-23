@@ -3,7 +3,7 @@ import React, { ChangeEvent, ReactNode, createContext, useState } from "react";
 
 interface CardContextProps {
   selectedCards: string[];
-  clickedServerId: string;
+  clickedServerId: string | null;
   counter: number;
   isActive: boolean;
   changeColorServer: boolean;
@@ -12,6 +12,10 @@ interface CardContextProps {
   handleSingleClick: (id: string) => void;
   handleSingleAndDoubleClick: (id: string) => void;
   handleDeselectCard: () => void;
+  colorStates: { [id: string]: boolean };
+  setColorStates: React.Dispatch<
+    React.SetStateAction<{ [id: string]: boolean }>
+  >;
 }
 
 const CardContext = createContext<CardContextProps>({
@@ -20,11 +24,13 @@ const CardContext = createContext<CardContextProps>({
   counter: 0,
   isActive: false,
   changeColorServer: false,
+  colorStates: { [""]: false },
   handleCardClick: () => {},
   handleDoubleClick: () => {},
   handleSingleClick: () => {},
   handleSingleAndDoubleClick: () => {},
   handleDeselectCard: () => {},
+  setColorStates: () => {},
 });
 
 interface ProviderProps {
@@ -37,6 +43,7 @@ const CardContextProvider = ({ children }: ProviderProps) => {
   const [isActive, setIsActive] = useState(false);
   const [changeColorServer, setChangeColorServer] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [colorStates, setColorStates] = useState<{ [id: string]: boolean }>({});
   const [clickedServerId, setClickedServerId] = useState<string | null>(null);
 
   // const handleCardClick = () => {
@@ -55,12 +62,16 @@ const CardContextProvider = ({ children }: ProviderProps) => {
 
   const handleSingleClick = (id: string) => {
     const isSelected = selectedCards.includes(id);
-    // If it's not selected, add it to the selectedCards state and increment the counter
+    setColorStates((prevColorStates) => ({
+      ...prevColorStates,
+      [id]: !prevColorStates[id], // Toggle color state for the clicked container
+    }));
+
     if (!isSelected) {
-      setSelectedCards((prevSelectedCards) => [...prevSelectedCards, id]);
+      setSelectedCards((prevSelectedCards) => [...prevSelectedCards, id]); // Select if not already selected
       setCounter((prevCounter) => prevCounter + 1);
       setIsActive(true);
-      setChangeColorServer(true);
+      setClickedServerId(id);
     } else {
       setSelectedCards((prevSelectedCards) =>
         prevSelectedCards.filter((cardId) => cardId !== id)
@@ -68,15 +79,23 @@ const CardContextProvider = ({ children }: ProviderProps) => {
       setCounter((prevCounter) => prevCounter - 1);
       setIsActive((prevIsActive) => (counter - 1 > 0 ? prevIsActive : false));
       setClickedServerId(null);
-      setChangeColorServer(false);
     }
-  };
-  const handleSingleAndDoubleClick = () => {
-    if (!selectedCards) {
-      setSingleClicks((prevClicks) => prevClicks + 1);
-    }
+
+    // Update color state for the clicked container only
   };
 
+  const handleSingleAndDoubleClick = (id: string) => {
+    // if (!selectedCards) {
+    //   setSingleClicks((prevClicks) => prevClicks + 1);
+    // }
+    // if (clickedServerId === id) {
+    //   setColorStates((prevColorStates) => ({
+    //     ...prevColorStates,
+    //     [id]: !prevColorStates[id],
+    //   }));
+    // }
+    console.log("ss");
+  };
   // const handleDeselectCard = () => {
   //   setSelectedCard(false);
   //   if (counter > 0) {
@@ -91,6 +110,8 @@ const CardContextProvider = ({ children }: ProviderProps) => {
     isActive,
     clickedServerId,
     changeColorServer,
+    setColorStates,
+    colorStates,
     // handleCardClick,
     // handleDoubleClick,
     // selectedCard,

@@ -18,19 +18,24 @@ const Container = ({ serverData }: { serverData: ServerData[] }) => {
     clickedServerId,
     isActive,
     changeColorServer,
+    colorStates,
+    setColorStates,
   } = cardContext;
 
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-5 w-full select-none">
       {serverData.map((server) => (
         <div
           key={server.id}
-          className={`bg-black border-2 border-cyan-100 rounded-lg p-4 h-16 w-full text-white cursor-pointer hover:bg-cyan-600 ${
-            selectedCards?.includes(server.id) || changeColorServer
+          className={`bg-black border-2 border-cyan-100 rounded-lg p-4 h-16 w-full text-white cursor-pointer ${
+            selectedCards?.includes(server.id) || colorStates[server.id] // Check color state from context
               ? "bg-cyan-600"
               : ""
           }`}
-          onClick={() => handleSingleClick(server.id)}
+          onClick={() => {
+            handleSingleClick(server.id);
+            // Toggle color state for the clicked container
+          }}
           onDoubleClick={() => handleSingleAndDoubleClick(server.id)}
         >
           <div className="flex justify-between">
