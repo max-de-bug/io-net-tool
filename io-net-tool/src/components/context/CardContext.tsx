@@ -1,17 +1,20 @@
 "use client";
 import React, { ChangeEvent, ReactNode, createContext, useState } from "react";
+import * as Api from "../../app/api/index";
 
 interface CardContextProps {
   selectedCards: string[];
   clickedServerId: string | null;
   counter: number;
   isActive: boolean;
+  showMenu: boolean;
   changeColorServer: boolean;
   handleCardClick: () => void;
   handleDoubleClick: () => void;
   handleSingleClick: (id: string) => void;
   handleSingleAndDoubleClick: (id: string) => void;
   handleDeselectCard: () => void;
+  handleDeleteCard: (id: string) => void;
   colorStates: { [id: string]: boolean };
   setColorStates: React.Dispatch<
     React.SetStateAction<{ [id: string]: boolean }>
@@ -23,6 +26,7 @@ const CardContext = createContext<CardContextProps>({
   clickedServerId: "",
   counter: 0,
   isActive: false,
+  showMenu: false,
   changeColorServer: false,
   colorStates: { [""]: false },
   handleCardClick: () => {},
@@ -30,6 +34,7 @@ const CardContext = createContext<CardContextProps>({
   handleSingleClick: () => {},
   handleSingleAndDoubleClick: () => {},
   handleDeselectCard: () => {},
+  handleDeleteCard: () => {},
   setColorStates: () => {},
 });
 
@@ -41,6 +46,7 @@ const CardContextProvider = ({ children }: ProviderProps) => {
   const [counter, setCounter] = useState(0);
   const [singleClicks, setSingleClicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [changeColorServer, setChangeColorServer] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [colorStates, setColorStates] = useState<{ [id: string]: boolean }>({});
@@ -61,6 +67,7 @@ const CardContextProvider = ({ children }: ProviderProps) => {
   //
 
   const handleSingleClick = (id: string) => {
+    setShowMenu(true);
     const isSelected = selectedCards.includes(id);
     setColorStates((prevColorStates) => ({
       ...prevColorStates,
@@ -79,6 +86,7 @@ const CardContextProvider = ({ children }: ProviderProps) => {
       setCounter((prevCounter) => prevCounter - 1);
       setIsActive((prevIsActive) => (counter - 1 > 0 ? prevIsActive : false));
       setClickedServerId(null);
+      setShowMenu(false);
     }
 
     // Update color state for the clicked container only
@@ -105,6 +113,13 @@ const CardContextProvider = ({ children }: ProviderProps) => {
   //   }
   // };
 
+  const handleDeleteCard = (id: string) => {
+    setSelectedCards((prevSelectedCards) =>
+      prevSelectedCards.filter((cardId) => cardId !== id)
+    );
+    Api.server.deleteServer(id);
+  };
+
   const AppContextValues: CardContextProps = {
     counter,
     isActive,
@@ -112,11 +127,13 @@ const CardContextProvider = ({ children }: ProviderProps) => {
     changeColorServer,
     setColorStates,
     colorStates,
+    showMenu,
     // handleCardClick,
     // handleDoubleClick,
     // selectedCard,
     handleSingleClick,
     handleSingleAndDoubleClick,
+    handleDeleteCard,
     // handleDeselectCard,
   };
 

@@ -4,6 +4,7 @@ import { authConfig } from "../../../lib/auth";
 import { prisma } from "../../../prisma/prisma/prismaClient/client";
 import { ServerValues } from "./dto";
 import axios from "../../../core/axios";
+import { revalidatePath } from "next/cache";
 
 export const serverSaving = async (values: ServerValues) => {
   try {
@@ -45,10 +46,24 @@ export const getServer = async () => {
         userId: userId,
       },
     });
+    revalidatePath("/");
     return servers;
   } catch (error) {
     // Handle any errors
     console.error("Error retrieving servers:", error);
     throw error; // Re-throw the error for the caller to handle
+  }
+};
+
+export const deleteServer = async (id: string) => {
+  try {
+    const server = await prisma.server.delete({
+      where: {
+        id: id,
+      },
+    });
+    revalidatePath("/");
+  } catch (error) {
+    console.error(error);
   }
 };

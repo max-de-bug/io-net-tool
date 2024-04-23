@@ -4,10 +4,10 @@ import { CardContext } from "./context/CardContext";
 
 const DashboardMenuVm = () => {
   const cardContext = useContext(CardContext);
-  const { selectedCards } = cardContext;
+  const { selectedCards, showMenu } = cardContext;
   return (
     <div className="flex flex-col text-white text-center rounded-md h-full w-full cursor-pointer">
-      {selectedCards ? (
+      {showMenu ? (
         <>
           <div className="p-2 border-2 h-13 rounded-md border-white mb-4 hover:bg-cyan-600">
             Setup Virtual machine

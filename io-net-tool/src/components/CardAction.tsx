@@ -5,7 +5,8 @@ import { CardContext } from "./context/CardContext";
 export const ServerActions = () => {
   const cardContext = useContext(CardContext);
   const {
-    selectedCard,
+    selectedCards,
+    handleDeleteCard,
     handleSingleClick,
     handleSingleAndDoubleClick,
     handleDeselectCard,

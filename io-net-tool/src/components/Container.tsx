@@ -1,6 +1,7 @@
 "use client";
 import { useContext, useState } from "react";
 import { CardContext } from "./context/CardContext";
+import { Button } from "./ui/button";
 
 interface ServerData {
   id: string;
@@ -15,6 +16,7 @@ const Container = ({ serverData }: { serverData: ServerData[] }) => {
     selectedCards,
     handleSingleClick,
     handleSingleAndDoubleClick,
+    handleDeleteCard,
     clickedServerId,
     isActive,
     changeColorServer,
@@ -39,10 +41,19 @@ const Container = ({ serverData }: { serverData: ServerData[] }) => {
           onDoubleClick={() => handleSingleAndDoubleClick(server.id)}
         >
           <div className="flex justify-between">
-            <p className="text-lg font-bold mb-4">Status</p>
+            <p className="text-lg font-bold flex-row">Status</p>
             <p>Server Name: {server.serverName}</p>
             <p>Username: {server.username}</p>
             <p>IP: {server.IP}</p>
+
+            <Button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent the click event from bubbling up and triggering the container click
+                handleDeleteCard(server.id); // Pass the server id to handleDeleteCard
+              }}
+            >
+              Delete
+            </Button>
           </div>
         </div>
       ))}
