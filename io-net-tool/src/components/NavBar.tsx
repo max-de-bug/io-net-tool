@@ -5,7 +5,7 @@ import { Button, buttonVariants } from "./ui/button";
 import { cn } from "../../lib/utils/cn";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
-import { loginIsRequiredClient } from "../../lib/auth";
+import { loginIsRequiredClient } from "../../lib/auth-client";
 import { useSession } from "next-auth/react";
 import UserAccount from "./UserAccount";
 

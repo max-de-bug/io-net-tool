@@ -1,13 +1,12 @@
 import { NextAuthOptions, User, getServerSession } from "next-auth";
-import { signIn, useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import TwitterProvider from "next-auth/providers/twitter";
 
-import { prisma } from "../prisma/prisma/prismaClient/client";
 import bcrypt from "bcryptjs";
+import { prisma } from "../prisma/client";
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -36,22 +35,27 @@ export const authConfig: NextAuthOptions = {
             data: {
               email: credentials.email,
               password: hashedPassword,
-              // You may add other fields if necessary
-            },
+            } as any,
           });
-          return newUser;
+          return {
+            id: newUser.id,
+            email: newUser.email,
+          } as User;
         }
-        if (dbUser) {
+        const userPassword = (dbUser as any).password;
+        if (dbUser && userPassword) {
           // Compare hashed password with the provided password using bcrypt
           const passwordMatch = await bcrypt.compare(
             credentials.password,
-            dbUser.password
+            userPassword
           );
 
           if (passwordMatch) {
             // Passwords match, return user data without sensitive information
-            const { password, createdAt, ...dbUserWithoutPassword } = dbUser;
-            return dbUserWithoutPassword as User;
+            return {
+              id: dbUser.id,
+              email: dbUser.email,
+            } as User;
           }
         }
         return null;
@@ -74,26 +78,34 @@ export const authConfig: NextAuthOptions = {
   secret: process.env.JWT_SECRET,
   callbacks: {
     async session({ session, token }) {
-      const sessionUser = await prisma.user.findFirst({
-        where: { email: session.user.email },
-      });
-      session.user.id = sessionUser?.id;
+      if (session.user.email) {
+        const sessionUser = await prisma.user.findFirst({
+          where: { email: session.user.email },
+        });
+        if (sessionUser) {
+          session.user.id = sessionUser.id;
+        }
+      }
       return session;
     },
     async signIn({ profile, credentials }) {
-      //     // Chec k if credentials are provided
-      const dbUser = await prisma.user.findFirst({
-        where: { email: profile.email },
-      });
-
-      if (!dbUser) {
-        const newUser = await prisma.user.create({
-          data: {
-            email: profile.email,
-          },
+      // Only handle OAuth providers (profile exists)
+      if (profile && profile.email) {
+        const dbUser = await prisma.user.findFirst({
+          where: { email: profile.email },
         });
-        return newUser;
+
+        if (!dbUser) {
+          await prisma.user.create({
+            data: {
+              email: profile.email,
+            } as any,
+          });
+        }
+        return true;
       }
+      // For credentials provider, return true (authorization handled in authorize)
+      return true;
     },
   },
 };
@@ -101,12 +113,4 @@ export const authConfig: NextAuthOptions = {
 export async function loginIsRequiredServer() {
   const session = await getServerSession(authConfig);
   if (!session) return redirect("/authChoise");
-}
-
-export function loginIsRequiredClient() {
-  if (typeof window !== "undefined") {
-    const session = useSession();
-    const router = useRouter();
-    if (!session) router.push("/authChoise");
-  }
 }
