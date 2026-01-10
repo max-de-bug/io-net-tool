@@ -17,10 +17,16 @@ class VMService:
     
     def connect(self) -> bool:
         """Connect to the server via SSH"""
+        try:
+            decrypted_password = self.server.get_ssh_password()
+        except Exception as e:
+            logger.error(f"Failed to decrypt password for server {self.server.id}: {e}")
+            return False
+        
         self.ssh = SSHService(
             host=self.server.ip_address,
             username=self.server.ssh_username,
-            password=self.server.ssh_password,
+            password=decrypted_password,
             port=self.server.ssh_port
         )
         return self.ssh.connect()
@@ -153,7 +159,6 @@ class VMService:
                 server=self.server,
                 name=name,
                 vm_username=vm_username,
-                vm_password=vm_password,
                 vcpus=vcpus,
                 ram_mb=ram_mb,
                 disk_gb=disk_gb,
@@ -162,6 +167,9 @@ class VMService:
                 status='running',
                 last_seen=timezone.now(),
             )
+            # Encrypt and set password separately
+            vm.set_vm_password(vm_password)
+            vm.save()
             
             return {
                 'success': True,
@@ -286,10 +294,11 @@ class VMService:
                 return {'success': False, 'error': 'VM has no IP address'}
             
             # Connect to VM
+            vm_password = vm.get_vm_password()
             vm_ssh = SSHService(
                 host=vm.ip_address,
                 username=vm.vm_username,
-                password=vm.vm_password,
+                password=vm_password,
             )
             
             if not vm_ssh.connect():

@@ -107,13 +107,17 @@ class VirtualMachineViewSet(viewsets.ModelViewSet):
         server = get_object_or_404(Server, id=data['server_id'])
         service = VMService(server)
         
+        # Use a secure random password if not provided
+        import secrets
+        vm_password = data.get('vm_password', secrets.token_urlsafe(16))
+        
         result = service.create_vm(
             name=data['name'],
             vcpus=data.get('vcpus', 2),
             ram_mb=data.get('ram_mb', 2048),
             disk_gb=data.get('disk_gb', 10),
             vm_username=data.get('vm_username', 'vmadm'),
-            vm_password=data.get('vm_password', 'vmadm'),
+            vm_password=vm_password,
             ip_address=data.get('ip_address'),
         )
         

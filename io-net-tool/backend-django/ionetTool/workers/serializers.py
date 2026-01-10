@@ -30,6 +30,14 @@ class ServerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Server
         fields = ['name', 'ip_address', 'ssh_username', 'ssh_password', 'ssh_port']
+    
+    def create(self, validated_data):
+        """Override create to encrypt password"""
+        plain_password = validated_data.pop('ssh_password')
+        server = Server.objects.create(**validated_data)
+        server.set_ssh_password(plain_password)
+        server.save()
+        return server
 
 
 class VirtualMachineSerializer(serializers.ModelSerializer):

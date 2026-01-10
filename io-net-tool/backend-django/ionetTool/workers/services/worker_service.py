@@ -26,10 +26,16 @@ class WorkerStatusService:
     
     def connect(self) -> bool:
         """Connect to the server via SSH"""
+        try:
+            decrypted_password = self.server.get_ssh_password()
+        except Exception as e:
+            logger.error(f"Failed to decrypt password for server {self.server.id}: {e}")
+            return False
+        
         self.ssh = SSHService(
             host=self.server.ip_address,
             username=self.server.ssh_username,
-            password=self.server.ssh_password,
+            password=decrypted_password,
             port=self.server.ssh_port
         )
         return self.ssh.connect()
@@ -124,10 +130,11 @@ class WorkerStatusService:
         # If VM is running, connect to it to check workers
         if vm.status == 'running' and vm.ip_address:
             try:
+                vm_password = vm.get_vm_password()
                 vm_ssh = SSHService(
                     host=vm.ip_address,
                     username=vm.vm_username,
-                    password=vm.vm_password,
+                    password=vm_password,
                     port=22
                 )
                 

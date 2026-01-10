@@ -17,4 +17,5 @@ paramiko>=3.4,<4.0
 
 # Utilities
 python-dotenv>=1.0,<2.0
+cryptography>=41.0,<42.0
 

@@ -20,7 +20,23 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-#z2&n9+%y*j)42
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+# Security: Only allow specific hosts in production
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+else:
+    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Encryption key for sensitive data (SSH passwords, etc.)
+# Generate with: from cryptography.fernet import Fernet; Fernet.generate_key()
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', None)
+
+# Security settings
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 
 # Application definition
@@ -108,16 +124,24 @@ ASGI_APPLICATION = 'ionetTool.asgi.application'
 
 
 # Channels configuration
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        # For production, use Redis:
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #     'hosts': [('127.0.0.1', 6379)],
-        # },
-    },
-}
+# Use Redis in production for scalability, InMemory for development
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/1')
+
+if DEBUG and not os.environ.get('USE_REDIS_CHANNELS'):
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [REDIS_URL] if isinstance(REDIS_URL, str) else REDIS_URL,
+            },
+        },
+    }
 
 
 # Database
@@ -142,11 +166,20 @@ CELERY_TIMEZONE = 'UTC'
 
 # REST Framework
 REST_FRAMEWORK = {
+    # TODO: Implement proper authentication (JWT or Session)
+    # For now, using AllowAny for development - MUST change in production!
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',  # SECURITY: Change to IsAuthenticated in production
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+    'EXCEPTION_HANDLER': 'workers.utils.exceptions.custom_exception_handler',
 }
 
 
